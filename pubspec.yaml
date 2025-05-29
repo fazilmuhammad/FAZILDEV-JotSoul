@@ -72,6 +72,7 @@ flutter:
      - assets/book_cover/book_cover_1.png
      - assets/book_cover/book_cover_2.png
      - assets/book_cover/book_cover_3.png
+     - assets/images/fazildev.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
