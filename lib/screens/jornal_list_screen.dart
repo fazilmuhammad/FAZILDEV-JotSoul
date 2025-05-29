@@ -107,14 +107,19 @@ class _JournalListScreenState extends State<JournalListScreen> {
                   itemBuilder: (context, index) {
                     final entry = entries[index];
                     return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                JournalReadScreen(entry: entry),
-                          ),
-                        );
+                      onTap: () async {
+                        final updatedEntry = await Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => JournalReadScreen(entry: entry),
+  ),
+);
+
+// Run a function after popping
+if (updatedEntry != null) {
+  // Your function here
+  _refreshEntries(); // For example
+}
                       },
                       child: Container(
                         width: 170,
@@ -168,14 +173,21 @@ class _JournalListScreenState extends State<JournalListScreen> {
                               color: Colors.white,
                             ),
                             child: ListTile(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        JournalReadScreen(entry: entry),
-                                  ),
-                                );
+                              onTap: () async {
+                        
+
+                                final updatedEntry = await Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => JournalReadScreen(entry: entry),
+  ),
+);
+
+// Run a function after popping
+if (updatedEntry != null) {
+  // Your function here
+  _refreshEntries(); // For example
+}
                               },
                               leading: Image.asset(
                                 'assets/book_cover/book_cover_${index % 3}.png',

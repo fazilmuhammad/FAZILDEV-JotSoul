@@ -127,7 +127,7 @@ class _JournalEditScreenState extends State<JournalEditScreen> {
       }
 
       if (!mounted) return;
-      Navigator.pop(context);
+      Navigator.pop(context, entry); // Pass the updated entry back
     }
   }
 }
