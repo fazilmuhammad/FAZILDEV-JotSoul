@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:jotsoul/helper/database_helper.dart';
 import 'package:jotsoul/models/journal_entry.dart';
 
@@ -20,58 +21,86 @@ class _JournalEditScreenState extends State<JournalEditScreen> {
   @override
   void initState() {
     super.initState();
-    _title = widget.entry?.title ?? '';
+    _title = widget.entry?.title ?? 'My Tiny Joys Journal';
     _content = widget.entry?.content ?? '';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(widget.entry == null ? 'New Entry' : 'Edit Entry'),
-        actions: [
-          if (widget.entry != null)
-            IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: _deleteEntry,
-            ),
-        ],
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        centerTitle: true,
+        title: TextFormField(
+          initialValue: _title,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            color: Colors.black,
+          ),
+          decoration: const InputDecoration(
+            border: InputBorder.none,
+            isDense: true,
+            contentPadding: EdgeInsets.zero,
+          ),
+          onChanged: (value) => _title = value,
+        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              TextFormField(
-                initialValue: _title,
-                decoration: const InputDecoration(labelText: 'Title'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a title';
-                  }
-                  return null;
-                },
-                onSaved: (value) => _title = value!,
+              Expanded(
+                child: TextFormField(
+                  initialValue: _content,
+                  decoration: const InputDecoration(
+                    hintText: 'Write something joyful...',
+                    border: InputBorder.none,
+                  ),
+                  style: const TextStyle(fontSize: 16),
+                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please write something.';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) => _content = value!,
+                ),
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                initialValue: _content,
-                decoration: const InputDecoration(labelText: 'Content'),
-                maxLines: 10,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter some content';
-                  }
-                  return null;
-                },
-                onSaved: (value) => _content = value!,
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _saveEntry,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Save Journal',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
-                child: const Text('Save'),
-                onPressed: _saveEntry,
-              ),
             ],
           ),
         ),
@@ -82,10 +111,12 @@ class _JournalEditScreenState extends State<JournalEditScreen> {
   Future<void> _saveEntry() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      
+
       final entry = JournalEntry(
         id: widget.entry?.id,
-        title: _title,
+        title: _title.trim().isEmpty
+            ? DateFormat('d MMM yyyy').format(DateTime.now())
+            : _title.trim(),
         content: _content,
       );
 
@@ -95,32 +126,6 @@ class _JournalEditScreenState extends State<JournalEditScreen> {
         await _dbHelper.update(entry);
       }
 
-      if (!mounted) return;
-      Navigator.pop(context);
-    }
-  }
-
-  Future<void> _deleteEntry() async {
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Entry'),
-        content: const Text('Are you sure you want to delete this entry?'),
-        actions: [
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () => Navigator.pop(context, false),
-          ),
-          TextButton(
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-            onPressed: () => Navigator.pop(context, true),
-          ),
-        ],
-      ),
-    );
-
-    if (shouldDelete == true) {
-      await _dbHelper.delete(widget.entry!.id);
       if (!mounted) return;
       Navigator.pop(context);
     }
